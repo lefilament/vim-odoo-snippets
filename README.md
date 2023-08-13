@@ -1,33 +1,39 @@
 vim-odoo-snippets
-========================
+=================
 
-This repository contains snippets files for Odoo, for the famous [UltiSnips](https://github.com/sirver/UltiSnips) plugin for Vim.
+This repository contains snippets files for Odoo, for the famous [coc-snippets](https://github.com/neoclide/coc-snippets) plugin for Vim.
+
+Note
+----
+This work is derived from module made for UltiSnips
 
 How to install
 -------------
-Using [Vundle](https://github.com/gmarik/vundle)
+Using [Vim-Plug](https://github.com/junegunn/vim-plug)
 -------------
 
 Add the following code in your vimrc
 ```Vim
-    " Install UltiSnips
-    Plugin 'SirVer/ultisnips'
+    " Install CoC
+    Plug 'neoclide/coc.nvim', {'branch': 'release'}
+```
 
-    " Install Odoo snippet
-    Plugin 'akretion/vim-odoo-snippets"
-
+Then copy the current snippets files from ultisnips directory to ~/.config/coc/ultisnips
+```bash
+cp ultisnips/*.snippets ~/.config/coc/ultisnips/
 ```
 
 Then run
 
 ```Vim
     :PluginInstall
+    :CocInstall coc-snippets
 ```
 
 Contribution
 -------------
 
-If you would like to contribute to this project, then just fork it in github and send a pull request.
+If you would like to contribute to this project, then just fork it in GitHub and send a pull request.
 
 License
 -------------

@@ -48,13 +48,8 @@ snippet iconfig
 from odoo.tools import config
 endsnippet
 
-snippet header
-# -*- coding: utf-8 -*-
-endsnippet
-
 snippet start
-# Copyright `date +%Y` Akretion (https://www.akretion.com).
-# @author `git config user.name` <`git config user.email`>
+# Copyright `date +%Y` Le Filament (https://le-filament.com).
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 ${1}
 endsnippet
@@ -63,26 +58,31 @@ snippet module
 {
     "name": "${1:Module name}",
     "summary": "${2:Module summary}",
-    "version": "${3:14.0}.1.0.0",
-    "category": "${4:Uncategorized}",
-    "website": "${5:www.akretion.com}",
-    "author": "${6: Akretion}",
+    "author": "${3: Le Filament}",
+    "website": "https://le-filament.com",
+    "version": "${4:16.0}.1.0.0",
+    "category": "${5:Uncategorized}",
     "license": "AGPL-3",
+    "depends": [
+        "${6:base}",
+    ],
+    "data": [${7}
+    ],
+    "assets": {
+        "web._assets_primary_variables": [${8}
+	],
+        "web._assets_frontend_helpers": [${9}
+	],
+        "web.assets_frontend": [${10}
+	],
+        "web.assets_tests": [${11}
+	],
+        "web.assets_qweb": [${12}
+	],
+    },
     "application": False,
     "installable": True,
-    "external_dependencies": {
-        "python": [],
-        "bin": [],
-    },
-    "depends": [
-        "${7:base}",
-    ],
-    "data": [${8}
-    ],
-    "demo": [${9}
-    ],
-    "qweb": [${10}
-    ]
+    "auto_install": False,
 }
 endsnippet
 
@@ -201,7 +201,14 @@ snippet cpt "compute"
 compute='_compute_`!p snip.rv=snip._parent.globals['last_field']`',
 endsnippet
 
+snippet foc " function onchange"
+@api.onchange(`!p snip.rv=snip._parent.globals['last_field']`)
+def _onchange_`!p snip.rv=snip._parent.globals['last_field']`'(self):
+    ${1}
+endsnippet
+
 snippet fcpt " function compute"
+@api.depends('field')
 def _compute_`!p snip.rv=snip._parent.globals['last_field']`'(self):
     for record in self:
 endsnippet
@@ -290,121 +297,79 @@ ${3:Priority}),
 endsnippet
 
 snippet func "def search"
-def search(self, cr, uid, args, offset=0, limit=None, order=None, context=None, count=False):
+@api.model
+def search(self, domain, offset=0, limit=None, order=None, count=False):
     """
     ${1:Comment}
     """
-    if context is None:
-        context = {}
-
-    res = super(${2:ClassName}, self).search(cr, uid, args, offset=offset, limit=limit, order=order, context=context, count=count)
-    ${3}
+    res = super().search(domain=domaine, offset=offset, limit=limit, order=order, count=count)
+    ${2}
     return res
 endsnippet
 
 snippet func "def read"
-def read(self, cr, uid, ids, fields=None, context=None, load='_classic_read'):
-    if context is None:
-        context = {}
-${1}
-    res = super(${2:ClassName}, self).read(cr, uid, ids, fields, context=context)
-    ${3}
+def read(self, fields=None, load='_classic_read'):
+    ${1}
+    res = super().read(fields)
+    ${2}
     return res
 endsnippet
 
 snippet fcreate "def create"
-def create(self, vals):
+@api.model_create_multi
+def create(self, vals_list):
     ${1}
-    record = super(${2:ClassName}, self).create(vals)
-    ${3}
-    return record
+    records = super().create(vals_list)
+    ${2}
+    return records
 endsnippet
 
 snippet fwrite "def write"
 def write(self, vals):
     ${1}
-    res = super(${2:ClassName}, self).write(vals)
-    ${3}
+    res = super().write(vals)
+    ${2}
     return res
 endsnippet
 
 snippet func "def unlink"
-def unlink(self, cr, uid, ids, context=None):
-    """
-    #TODO make doc string
-    ${2:Comment this}
-    """
-    if context is None:
-        context = {}
-    #TODO: process before delete resource
-    ${3}
-    res = super(${1:ClassName}, self).unlink(cr, uid, ids, context=context)
+def unlink(self):
+    ${1}
+    res = super().unlink()
     return res
 endsnippet
 
 snippet func "def copy"
-def copy(self, cr, uid, id, default=None, context=None):
-    """
-    #TODO make doc string
-    ${2:Comment this}
-    """
-    if context is None:
-        context = {}
-    #TODO : process on result
-    ${3}
-    return super(${1:ClassName}, self).copy(cr, uid, id, default, context=context)
+def copy(self, default=None):
+    ${1}
+    return super().copy(default)
 endsnippet
 
 snippet func "def default_get"
-def default_get(self, cr, uid, fields_list, context=None):
-    """
-    #TODO make doc string
-    ${1:Comment this}
-    """
-    if context is None:
-        context = {}
-    values = super(${2:ClassName}, self).default_get(cr, uid, fields_list, context=context)
-    ${3}
-    return values
+@api.model
+def default_get(self, fields_list):
+    defaults = super().default_get(fields_list)
+    ${1}
+    return defaults
 endsnippet
 
 snippet func "def fields_get"
-def fields_get(self, cr, uuid, fields=None, context=None):
-    """
-    #TODO make doc string
-    ${2:Comment this}
-    """
-    if context is None:
-        context = {}
-    #TODO : process on result
-    ${3}
-    return super(${1:ClassName}, self).fields_get(cr, uid, fields, context, read_access)
+@api.model
+def fields_get(self, allfields=None, attributes=None):
+    ${1}
+    return super().fields_get(allfields, attributes)
 endsnippet
 
 snippet func "def init"
-def init(self, cr):
-    """
-    ${2:Comment this}
-    """
-    #TODO : process on result
+def init(self):
     cr.execute("""CREATE OR REPLACE VIEW ${1:View} AS (
             ${3:SELECT...})
     """)
 ${4}
 endsnippet
 
-snippet func "def _name_get"
-def name_get(self, cr, uid, ids, context=None):
-    """
-    #TODO make doc string
-    ${1:Comment this}
-    """
-    if context is None:
-        context = {}
-    if not len(ids):
-        return []
-    #TODO : search on name field or _res_name fields
-    #and make a result [(id, name), (id, name), ...]
+snippet func "def name_get"
+def name_get(self):
     reads = self.read(cr, uid, ids, [self._rec_name], context, load='_classic_write')]
     res = []
     ${2}
@@ -413,79 +378,45 @@ def name_get(self, cr, uid, ids, context=None):
     return res
 endsnippet
 
-snippet func "def _name_search"
-def name_search(self, cr, uid, name, args=None, operator='ilike', context=None, limit=80):
-    """
-    #TODO make doc string
-    ${1:Comment this}
-    """
-    #TODO: make a search on specific fields and get ids
+snippet func "def name_search"
+def name_search(self, name='', args=None, operator='ilike', limit=100):
     if args is None:
         args=[]
-    if context is None:
-        context = {}
     ids = []
     if name:
         ids = self.search(cr, uid, [('code', 'ilike', name)] + args, limit=limit)
     if not ids:
         ids = self.search(cr, uid, [('name', operator, name)] + args, limit=limit)
-    return self.name_get(cr, uid, ids, context=context)
+    return self.browse(ids).sudo().name_get()
     ${2}
 endsnippet
 
-snippet func "fields_view_get v 6.0"
-def fields_view_get(self, cr, uid, view_id=None, view_type='form', context=None, toolbar=False, submenu=False):
-    """
-    Comment here
-    """
-    # use lxml to compose the arch XML
-    arch = ${1:XML HERE}
-    fields = ${2:FIELDS HERE}
-    tb = {'print': [], 'action': [], 'relate': []}
-    result = {
-        'arch': arch,
-        'fields': fields,
-        'toolbar': tb,
-    }
-    return result
-###
-## Common method define in osv.osv
-##
-endsnippet
-
 snippet read
-self.read(cr, uid, ${1:ids}, ['${2:field}'], context=context)${3}
+self.read(['${2:field}'])${3}
 endsnippet
 
 snippet browse
-self.browse(cr, uid, ${1:ids}, context=context)${2}
+self.browse(${1:ids})${2}
 endsnippet
 
 snippet search
-self.search(cr, uid, [('${1:state}', '${2:=}', '${3:done}')], context=context)${4}
+self.search([('${1:state}', '${2:=}', '${3:done}')])${4}
 endsnippet
 
 snippet create
-id = self.create(cr, uid, ${1:vals}, context=context)${2}
+id = self.create([${1:vals}])${2}
 endsnippet
 
 snippet write
-self.write(cr, uid, ${1:ids}, ${2:vals}, context=context)${3}
+self.write(${2:vals})${3}
 endsnippet
 
 snippet unlink
-self.unlink(cr, uid, ${1:ids}, context=context)${2}
+self.unlink()${2}
 endsnippet
 
 snippet copy
-self.copy(cr, uid, ${1:ids}, ${2:default}, context=context)${3}
-endsnippet
-
-snippet perm_read
-self.perm_read(cr, uid, [${1:id}], context=context)${2}
-#
-# Define all variables in osv.osv begin by _
-#
+self.copy(${2:default})${3}
 endsnippet
 
 snippet _ "_auto"
@@ -493,25 +424,12 @@ _auto = False
 endsnippet
 
 snippet _ "_constraints"
-def ${1:_check_method}(self, cr, uid, ids, context=None):
-    #TODO : check condition and return boolean accordingly
-    if not context is None:
-        context = {}
+@api.constrains('${2:field_name}')
+def ${1:_check_method}(self):
+    for record in self:
+        if record.'${2:field_name}' == True:
+	    raise ValidationError("Field ${2:field_name} must be true")
     return True
-
-_constraints = [
-    ($1, 'Error: Invalid Message', ['${2:field_name}']),
-]
-endsnippet
-
-snippet _ "_date_name"
-_date_name='${1:Date field}'
-endsnippet
-
-snippet _ "_defaults"
-_defaults = {
-    '${1:Field}': lambda *a: ${2:Value},
-}
 endsnippet
 
 snippet _ "_description"
@@ -530,10 +448,6 @@ snippet _ "_rec_name"
 _rec_name = '${1:Field name}'
 endsnippet
 
-snippet _ "_sequence"
-_sequence = '${1:Field name use as sequence}'
-endsnippet
-
 snippet _ "_sql_constraints"
 _sql_constraints = [
     ('${1:Field name}_uniq', 'unique ($1)', 'The $1 of the OpenERPModel must be unique !'),
@@ -544,87 +458,72 @@ snippet _ "_table"
 _table = '${1:Table name in PostgreSQL}'
 endsnippet
 
-snippet _ "_sql"
-_sql = """${1:CREATE TABLE .....}"""
-endsnippet
-
 snippet _ "_log_access"
 _log_access = False
 endsnippet
 
 snippet . "search"
-.search(cr, uid, ${1:domain}, offset=${2:0}, limit=${3:None}, order=${4:None}, context=${5:context})${6}
+.search(${1:domain}, offset=${2:0}, limit=${3:None}, order=${4:None}, count=${5:False})${6}
 endsnippet
 
 snippet . "browse"
-.browse(cr, uid, ${1:ids}, context=${2:context})${3}
+.browse(${1:ids})${2}
 endsnippet
 
 snippet . "read"
-.read(cr, uid, ${1:ids}, ['${2:name}'], context=${3:context})${4}
+.read(['${1:name}'])${2}
 endsnippet
 
 snippet . "create"
-.create(cr, uid, ${1:vals}, context=${2:context})${3}
+.create([${1:vals}])${2}
 endsnippet
 
 snippet . "write"
-.write(cr, uid, ${1:ids}, ${2:vals}, context=${3:context})${4}
+.write(${2:vals})${3}
 endsnippet
 
 snippet . "unlink"
-.unlink(cr, uid, ${1:ids}, context=${2:context})${3}
+.unlink()${1}
 endsnippet
 
 snippet . "copy"
-.copy(cr, uid, ${1:id}, ${2:default}, context=${3:context})${4}
-###
-## define exception
-endsnippet
-
-snippet raise "raise orm.except_orm(title, message)"
-raise orm.except_orm(
-_('${1:Error}'),
-_('${2:Message}'))
-###
-## Cursor
+.copy(${1:default})${2}
 endsnippet
 
 snippet cr "cr.execute()"
-cr.execute("""${1:Query}""")
+self.env.cr.execute("""${1:Query}""")
 endsnippet
 
 snippet cr "cr.mogrify()"
-cr.mogrify("""${1:Query}""")
+self.env.cr.mogrify("""${1:Query}""")
 endsnippet
 
 snippet cr "cr.commit()"
-cr.commit()
+self.env.cr.commit()
 endsnippet
 
 snippet cr "cr.rollback()"
-cr.rollback()
+self.env.cr.rollback()
 endsnippet
 
 snippet cr "cr.close()"
-cr.close()
+self.env.cr.close()
 endsnippet
 
 snippet cr "cr.autocommit()"
-cr.autocommit(${1:True})
+self.env.cr.autocommit(${1:True})
 endsnippet
 
 snippet cr "cr.fetchall()"
-cr.fetchall()
+self.env.cr.fetchall()
 endsnippet
 
 snippet cr "cr.dictfetchall()"
-cr.dictfetchall()
+self.env.cr.dictfetchall()
 endsnippet
 
 snippet cr "cr.fetchone()"
-cr.fetchone()
-# Usefull tips
+self.env.cr.fetchone()
 endsnippet
 
 snippet pooler
@@ -687,7 +586,7 @@ snippet fm
 endsnippet
 
 snippet super
-super(${1:ClassName}, self).${2:methodName}(cr, uid, ${3:ids}, ${4}context=context)${5}
+super().${1:methodName}()${2}
 endsnippet
 
 snippet def
